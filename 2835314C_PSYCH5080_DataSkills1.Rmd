@@ -1,0 +1,133 @@
+---
+title: "PSYCH5080 Data Skills Assignment 1"
+author: "School of Psychology and Neuroscience"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Start of the Assignment 
+
+## Task 1 - Load the tidyverse
+
+```{r TA101, warning=FALSE, message=FALSE}
+library(tidyverse)
+
+
+```
+
+## Task 2 - Load in the data
+
+```{r TA102, message=FALSE}
+
+
+demogs <- read_csv("participant_demogs.csv")
+scales <- read_csv("participant_scales.csv")
+responses <- read_csv("QHC_responses.csv")
+scoring <- read_csv("QHC_scoring.csv")
+
+```
+
+## Task 3 - Sorting the data
+
+```{r TA103}
+
+
+demogs_sort <- demogs[order(demogs$AGE, demogs$HANDEDNESS, decreasing = FALSE),]
+
+```
+
+## Task 4 - Young and Left-Handed
+
+```{r TA104}
+
+
+young_left <- 62
+
+
+```
+
+## Task 5 - Removing Youngsters
+
+```{r TA105}
+
+
+demog_filt <- demogs[!(demogs$AGE < 60),]
+
+```
+
+## Task 6 - Musical People Demographics
+
+```{r TA106}
+
+music_groups <- group_by(demog_filt, MUSICAL)
+music_desc <- summarise(music_groups, n = sum(PID), mean_age = mean(demog_filt$AGE), median_age = median(demog_filt$AGE))
+
+```
+
+## Task 7 - We don't need Education
+
+```{r TA107}
+
+
+demog_red <- subset(demogs, select = -c(EDUCATION) )
+
+```
+
+## Task 8 - Gathering Responses together
+
+```{r TA108}
+
+ 
+resp_long <- pivot_longer(data = responses,
+                          cols = c("QHC1", "QHC2", "QHC3", "QHC4", "QHC5", "QHC6", "QHC7", "QHC8", "QHC9", "QHC10", "QHC11", "QHC12", "QHC13", "QHC14", "QHC15"),
+                          names_to = "name", values_to = "answers"
+                          )
+
+
+```
+
+## Task 9 - Joining the data
+
+```{r TA109}
+
+
+resp_scores <- inner_join(resp_long, scoring, by = "answers")
+
+```
+
+## Task 10 - Working the Pipes
+
+```{r TA110}
+
+
+median_lang <-  resp_scores %>%
+  group_by(PID) %>%
+  summarise(Total_QHC = sum(points)) %>%
+  inner_join(scales, by ="PID") %>%
+  group_by(XLANG) %>%
+  summarise(n_lang = n(), median_score = median(Total_QHC))
+
+
+```
+
+## Task 11 - Interpretation
+
+```{r TA111}
+
+answer_TA111 <- 2
+```
+
+# Finished
+
+Well done, you are finished. Now it would be an excellent idea to save your code, close RStudio and R, reopen RStudio and R, reopen your code, and then knit your code one last time to HTML. If there are no errors in your coding then your code should produce an HTML output with all your answers in place. If any errors appear you should try and rectify them before submitting the .Rmd file. Remember this does not mean that your answers are correct, it just means that you have code that runs. Remember to submit your assignment through Moodle, in the format of `GUID_PSYCH5080_DataSkills1.Rmd` by the deadline, however do read below as some final checks.
+
+**Make sure that before you submit that :**
+
+1. All the code chunks are named as they were in the original file, TA101 to TA111. All code chunks start and end correctly with backticks.
+2. That all variables, tibbles, objects, columns, etc are named as they were originally given or asked to be named. Check spelling, e.g. `answers` is not the same as `anwser` nor `answer` and only one will be considered correct regardless of what was meant. Be reproducible!
+3. That when you knit the file as an HTML, a webpage is produced and that the code does not crash due to an error.
+4. That you are submitting the file as an .Rmd file and nothing else.
+5. That the file you want to submit is the file you are about to submit as we can not return files for a second chance of submission.
